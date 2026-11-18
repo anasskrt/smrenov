@@ -1,0 +1,211 @@
+---
+// Carte schématique de la zone d'intervention (rayon de 100 km autour de Périgueux),
+// calculée à partir des coordonnées GPS des villes. Aucune dépendance, aucun appel externe.
+import { zone } from '../data/site';
+
+const W = 560;
+const H = 500;
+const cx = 280;
+const cy = 250;
+const pxPerKm = 2.4;
+
+const center = zone.find((z) => z.main)!;
+const kmPerDegLon = 111.32 * Math.cos((center.lat! * Math.PI) / 180);
+const kmPerDegLat = 110.57;
+
+const project = (lat: number, lon: number) => ({
+	x: cx + (lon - center.lon!) * kmPerDegLon * pxPerKm,
+	y: cy - (lat - center.lat!) * kmPerDegLat * pxPerKm,
+});
+
+// Position des étiquettes (décalage en px et alignement) pour éviter les chevauchements.
+const labels: Record<string, { dx: number; dy: number; anchor: 'start' | 'middle' | 'end'; text?: string }> = {
+	Périgueux: { dx: 11, dy: 6, anchor: 'start' },
+	"Château-l'Évêque": { dx: 9, dy: -2, anchor: 'start' },
+	'Brantôme en Périgord': { dx: -9, dy: 4, anchor: 'end', text: 'Brantôme' },
+	Thiviers: { dx: -9, dy: 4, anchor: 'end' },
+	Nontron: { dx: 9, dy: 4, anchor: 'start' },
+	Ribérac: { dx: -9, dy: 4, anchor: 'end' },
+	'Saint-Astier': { dx: -9, dy: 4, anchor: 'end' },
+	Mussidan: { dx: 9, dy: 5, anchor: 'start' },
+	'Montpon-Ménestérol': { dx: -6, dy: -9, anchor: 'end' },
+	Bergerac: { dx: 8, dy: -9, anchor: 'start' },
+	'Sarlat-la-Canéda': { dx: 0, dy: -12, anchor: 'middle' },
+	'Terrasson-Lavilledieu': { dx: 0, dy: 18, anchor: 'middle' },
+	'Brive-la-Gaillarde': { dx: 9, dy: 4, anchor: 'start' },
+	Angoulême: { dx: -9, dy: 4, anchor: 'end' },
+	Limoges: { dx: 9, dy: 4, anchor: 'start' },
+	Libourne: { dx: -9, dy: -3, anchor: 'end' },
+};
+
+const points = zone
+	.filter((z) => z.map && z.lat !== undefined && z.lon !== undefined)
+	.map((z) => {
+		const l = labels[z.name] ?? { dx: 9, dy: 4, anchor: 'start' as const };
+		return { ...z, ...project(z.lat!, z.lon!), ...l, label: l.text ?? z.name };
+	});
+
+// Cours d'eau schématiques (km depuis Périgueux : x vers l'est, y vers le sud), lissés en courbes.
+const isle = [
+	[33, -40], [23.4, -24], [15.6, -9.5], [8.5, -2.8], [4.9, -0.6], [0, 0.3], [-4.7, 0.25],
+	[-15.2, 4.6], [-28.2, 16.8], [-44.2, 19.8], [-58, 24], [-75.8, 29.8],
+];
+const dordogne = [
+	[72, 30], [59.3, 31.8], [38.8, 42.6], [14, 37], [1.5, 38.1], [-18.8, 36.9], [-39.3, 38.1], [-59.8, 36.4], [-75.8, 29.8],
+];
+
+const f = (n: number) => n.toFixed(1);
+const curve = (km: number[][]) => {
+	const pts = km.map(([x, y]) => [cx + x * pxPerKm, cy + y * pxPerKm]);
+	let d = `M${f(pts[0][0])} ${f(pts[0][1])}`;
+	for (let i = 0; i < pts.length - 1; i++) {
+		const p0 = pts[i - 1] ?? pts[i];
+		const p1 = pts[i];
+		const p2 = pts[i + 1];
+		const p3 = pts[i + 2] ?? p2;
+		const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+		const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+		d += ` C${f(c1[0])} ${f(c1[1])} ${f(c2[0])} ${f(c2[1])} ${f(p2[0])} ${f(p2[1])}`;
+	}
+	return d;
+};
+
+const rings = [50, 100].map((km) => ({ km, r: km * pxPerKm }));
+---
+
+<svg class="map" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Carte schématique de la zone d'intervention : 100 km autour de Périgueux, toute la Dordogne">
+	{
+		rings.map(({ km, r }) => (
+			<g class="map__ring">
+				<circle cx={cx} cy={cy} r={r} />
+				<text x={cx - r * 0.7071 - 4} y={cy - r * 0.7071 - 4} text-anchor="end">
+					{km} km
+				</text>
+			</g>
+		))
+	}
+
+	<path class="map__river" d={curve(isle)} />
+	<path class="map__river" d={curve(dordogne)} />
+	<text class="map__river-label" x="366" y="150">l'Isle</text>
+	<text class="map__river-label" x="300" y="364" text-anchor="middle">la Dordogne</text>
+
+	{
+		points.map((p) => (
+			<g class:list={['map__place', { 'map__place--main': p.main, 'map__place--base': p.base }]}>
+				{p.main && <circle class="map__halo" cx={p.x} cy={p.y} r="13" />}
+				{p.base ? (
+					<rect class="map__base" x={p.x - 4} y={p.y - 4} width="8" height="8" />
+				) : (
+					<circle class="map__dot" cx={p.x} cy={p.y} r={p.main ? 5.5 : 3.5} />
+				)}
+				<text x={p.x + p.dx} y={p.y + p.dy} text-anchor={p.anchor}>
+					{p.label}
+				</text>
+			</g>
+		))
+	}
+
+	<g class="map__north" transform={`translate(${W - 26} 18)`}>
+		<path d="M0 30V2M-5 9l5-7 5 7" />
+		<text x="0" y="46" text-anchor="middle">N</text>
+	</g>
+</svg>
+
+<style>
+	.map {
+		width: 100%;
+		height: auto;
+		overflow: visible;
+		font-family: var(--font);
+	}
+
+	/* Détourage couleur fond : les rivières passent derrière les noms sans les traverser */
+	.map text {
+		paint-order: stroke;
+		stroke: var(--night);
+		stroke-width: 4px;
+		stroke-linejoin: round;
+		fill: var(--fg-soft);
+		font-size: 13px;
+		font-stretch: var(--narrow);
+		font-weight: 500;
+		letter-spacing: 0.02em;
+	}
+
+	.map__ring circle {
+		fill: none;
+		stroke: var(--rule);
+		stroke-dasharray: 3 5;
+	}
+
+	.map__ring text {
+		font-size: 12px;
+	}
+
+	.map__river {
+		fill: none;
+		stroke: #6f8fd8;
+		stroke-width: 1.75;
+		stroke-linecap: round;
+	}
+
+	.map .map__river-label {
+		fill: #8fa8e2;
+		font-style: italic;
+		font-size: 12px;
+	}
+
+	.map__dot {
+		fill: var(--fg);
+	}
+
+	.map__base {
+		fill: var(--night);
+		stroke: var(--fg);
+		stroke-width: 1.5;
+	}
+
+	.map__halo {
+		fill: none;
+		stroke: var(--fg);
+		stroke-opacity: 0.45;
+	}
+
+	.map .map__place--main text {
+		fill: var(--fg);
+		font-size: 16px;
+		font-stretch: 100%;
+		font-weight: 600;
+	}
+
+	.map .map__place--base text {
+		fill: var(--fg);
+	}
+
+	.map__north path {
+		fill: none;
+		stroke: var(--fg-soft);
+		stroke-width: 1.5;
+	}
+
+	.map__north text {
+		font-weight: 600;
+	}
+
+	/* Sur mobile la carte est réduite : on agrandit les étiquettes pour qu'elles restent lisibles */
+	@media (max-width: 560px) {
+		.map text {
+			font-size: 16px;
+		}
+
+		.map .map__place--main text {
+			font-size: 19px;
+		}
+
+		.map__ring text,
+		.map .map__river-label {
+			font-size: 14px;
+		}
+	}
+</style>

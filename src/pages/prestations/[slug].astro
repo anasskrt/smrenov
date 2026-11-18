@@ -1,0 +1,392 @@
+---
+// Une page par prestation, générée à partir de src/data/services.ts.
+import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
+import CtaBanner from '../../components/CtaBanner.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import ServiceIcon from '../../components/ServiceIcon.astro';
+import Contact from '../../components/Contact.astro';
+import Icon from '../../components/Icon.astro';
+import { services, type Service } from '../../data/services';
+import { projects, coverFor } from '../../data/projects';
+import { site } from '../../data/site';
+
+export function getStaticPaths() {
+	return services.map((service) => ({ params: { slug: service.slug }, props: { service } }));
+}
+
+interface Props {
+	service: Service;
+}
+
+const { service } = Astro.props;
+const related = projects.filter((project) => project.service === service.slug).slice(0, 3);
+const cover = coverFor(service.slug);
+const others = services.filter((s) => s.slug !== service.slug);
+
+const pageUrl = `${site.url}/prestations/${service.slug}/`;
+const schema = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Service',
+		name: service.title,
+		serviceType: service.shortTitle,
+		description: service.metaDescription,
+		url: pageUrl,
+		provider: { '@id': `${site.url}/#entreprise` },
+		areaServed: { '@type': 'AdministrativeArea', name: site.department },
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Accueil', item: `${site.url}/` },
+			{ '@type': 'ListItem', position: 2, name: 'Prestations', item: `${site.url}/#prestations` },
+			{ '@type': 'ListItem', position: 3, name: service.shortTitle, item: pageUrl },
+		],
+	},
+];
+---
+
+<Layout title={service.metaTitle} description={service.metaDescription} schema={schema}>
+	<PageHero
+		title={service.h1}
+		lead={service.short}
+		crumbs={[{ label: 'Accueil', href: '/' }, { label: 'Prestations', href: '/#prestations' }, { label: service.shortTitle }]}
+		photo={
+			cover && {
+				label: service.photo,
+				width: service.cotes[0],
+				height: service.cotes[1],
+				image: cover.image,
+				alt: `${cover.title}, réalisation smrenov24`,
+				focus: cover.focus,
+			}
+		}
+	>
+		<Fragment slot="actions">
+			<a class="btn" href="#devis">Demander un devis gratuit</a>
+			<a class="btn btn--ghost" href={site.phoneHref}><Icon name="phone" />Appeler</a>
+		</Fragment>
+	</PageHero>
+
+	<section class="detail" aria-labelledby="options-title">
+		<div class="container">
+			<div class="detail__intro">
+				<p class="detail__statement">{service.intro[0]}</p>
+				<p class="lead">{service.intro[1]}</p>
+			</div>
+
+			<div class="detail__options">
+				<div class="detail__head">
+					<div class="detail__icon"><ServiceIcon name={service.slug} /></div>
+					<h2 id="options-title" class="title">{service.optionsTitle}</h2>
+				</div>
+				<ul class="options" role="list">
+					{
+						service.options.map((option) => (
+							<li>
+								<h3>{option.title}</h3>
+								<p>{option.text}</p>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<CtaBanner />
+
+	{
+		related.length > 0 && (
+			<section class="related" aria-labelledby="related-title">
+				<div class="container">
+					<div class="related__head">
+						<h2 id="related-title" class="title">
+							Nos réalisations
+						</h2>
+						<a class="btn btn--ghost" href={`/realisations/?prestation=${service.slug}`}>
+							Voir toutes les réalisations
+						</a>
+					</div>
+					<ul class="related__grid" role="list">
+						{related.map((project) => (
+							<li>
+								<ProjectCard project={project} showService={false} />
+							</li>
+						))}
+					</ul>
+				</div>
+			</section>
+		)
+	}
+
+	<section class="faq" aria-labelledby="faq-title">
+		<div class="container faq__grid">
+			<h2 id="faq-title" class="title">Questions fréquentes</h2>
+			<div class="faq__list">
+				{
+					service.faq.map((item) => (
+						<details>
+							<summary>
+								<span>{item.q}</span>
+								<span class="faq__toggle" aria-hidden="true" />
+							</summary>
+							<p>{item.a}</p>
+						</details>
+					))
+				}
+			</div>
+		</div>
+
+		<div class="container">
+			<nav class="others" aria-labelledby="others-title">
+				<h2 id="others-title" class="others__title">Nos autres prestations</h2>
+				<ul role="list">
+					{
+						others.map((other) => (
+							<li>
+								<a href={`/prestations/${other.slug}/`}>
+									<span class="others__icon">
+										<ServiceIcon name={other.slug} />
+									</span>
+									{other.shortTitle}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</nav>
+		</div>
+	</section>
+
+	<Contact />
+</Layout>
+
+<style>
+	/* Détail de la prestation -------------------------------------------- */
+	.detail {
+		padding-block: var(--section);
+	}
+
+	.detail__intro {
+		max-width: 60rem;
+	}
+
+	.detail__statement {
+		font-size: clamp(1.5rem, 1.1rem + 1.5vw, 2.25rem);
+		font-weight: 500;
+		line-height: 1.3;
+		letter-spacing: -0.015em;
+	}
+
+	.detail__intro .lead {
+		margin-top: 1.5rem;
+	}
+
+	.detail__options {
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		gap: 2rem clamp(2.5rem, 6vw, 7rem);
+		margin-top: clamp(3.5rem, 7vw, 6rem);
+	}
+
+	.detail__head {
+		align-self: start;
+		position: sticky;
+		top: calc(var(--header-h) + 2.5rem);
+	}
+
+	.detail__icon {
+		width: 4rem;
+		margin-bottom: 1.5rem;
+		color: var(--night);
+	}
+
+	.options {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		column-gap: 2.5rem;
+		border-top: 1px solid var(--fg);
+	}
+
+	.options li {
+		padding-block: 1.75rem;
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.options h3 {
+		font-size: 1.25rem;
+	}
+
+	.options p {
+		margin-top: 0.5rem;
+		color: var(--fg-soft);
+	}
+
+	/* Réalisations liées -------------------------------------------------- */
+	.related {
+		padding-block: var(--section);
+		background: var(--mist);
+	}
+
+	.related__head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: end;
+		justify-content: space-between;
+		gap: 1.5rem 2rem;
+		margin-bottom: clamp(2rem, 4vw, 3rem);
+	}
+
+	.related__grid {
+		--ph-ratio: 4 / 5;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1.5rem;
+	}
+
+	/* FAQ ------------------------------------------------------------------ */
+	.faq {
+		padding-block: var(--section);
+	}
+
+	.faq__grid {
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		gap: 2rem clamp(2.5rem, 6vw, 7rem);
+		align-items: start;
+	}
+
+	.faq__list {
+		border-top: 1px solid var(--fg);
+	}
+
+	details {
+		border-bottom: 1px solid var(--rule);
+	}
+
+	summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.5rem;
+		padding-block: 1.5rem;
+		font-size: 1.125rem;
+		font-weight: 600;
+		line-height: 1.4;
+		list-style: none;
+		cursor: pointer;
+	}
+
+	summary::-webkit-details-marker {
+		display: none;
+	}
+
+	summary:hover span:first-child {
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 0.25em;
+	}
+
+	/* Croix qui se transforme en trait à l'ouverture */
+	.faq__toggle {
+		position: relative;
+		flex: none;
+		width: 1rem;
+		height: 1rem;
+	}
+
+	.faq__toggle::before,
+	.faq__toggle::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 0;
+		width: 100%;
+		height: 1.5px;
+		background: currentColor;
+		transition: transform 0.2s ease;
+	}
+
+	.faq__toggle::after {
+		transform: rotate(90deg);
+	}
+
+	details[open] .faq__toggle::after {
+		transform: rotate(0deg);
+	}
+
+	details p {
+		max-width: 62ch;
+		padding-bottom: 1.75rem;
+		color: var(--fg-soft);
+	}
+
+	/* Autres prestations (maillage interne) ------------------------------- */
+	.others {
+		margin-top: clamp(4rem, 8vw, 6.5rem);
+		padding-top: 2.5rem;
+		border-top: 1px solid var(--rule);
+	}
+
+	.others__title {
+		font-size: 1.25rem;
+	}
+
+	.others ul {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0 2.5rem;
+		margin-top: 1.25rem;
+	}
+
+	.others a {
+		display: flex;
+		align-items: center;
+		gap: 0.875rem;
+		padding-block: 0.75rem;
+		border-bottom: 1px solid var(--rule);
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	.others a:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
+	}
+
+	.others__icon {
+		flex: none;
+		width: 1.75rem;
+		color: var(--night);
+	}
+
+	@media (max-width: 900px) {
+		.detail__options,
+		.faq__grid {
+			grid-template-columns: 1fr;
+		}
+
+		.detail__head {
+			position: static;
+		}
+
+		.related__grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.others ul {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 560px) {
+		.options,
+		.related__grid,
+		.others ul {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

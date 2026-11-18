@@ -1,0 +1,96 @@
+---
+// Pictogrammes des prestations, dessinés comme des élévations de menuiserie
+// (le triangle pointillé est le symbole d'ouverture : sa pointe indique le côté des charnières).
+interface Props {
+	name: string;
+}
+
+const { name } = Astro.props;
+
+const drawings: Record<string, string> = {
+	'portes-entree': `
+		<path d="M11.75 42.25V5.75h24.5v36.5"/>
+		<rect x="14.75" y="8.75" width="18.5" height="33.5"/>
+		<rect x="18.75" y="12.75" width="10.5" height="12.5"/>
+		<path d="M29.75 28v5.5"/>
+		<path d="M4 42.25h40"/>`,
+	fenetres: `
+		<rect x="7.75" y="5.75" width="32.5" height="36.5"/>
+		<rect x="10.75" y="8.75" width="12.5" height="30.5"/>
+		<rect x="24.75" y="8.75" width="12.5" height="30.5"/>
+		<path d="M23.25 9.5 10.75 24l12.5 14.5M24.75 9.5 37.25 24l-12.5 14.5" stroke-dasharray="2 2" opacity=".55"/>
+		<path d="M4 42.25h40"/>`,
+	vitrage: `
+		<rect x="9.75" y="5.75" width="28.5" height="36.5"/>
+		<rect x="13.75" y="9.75" width="20.5" height="28.5"/>
+		<path d="M17.5 20.5l5-5M17.5 28.5l12-12M23 31.5l7-7" opacity=".55"/>
+		<path d="M4 42.25h40"/>`,
+	'fenetres-de-toit': `
+		<path d="M3 27 24 9l21 18"/>
+		<path d="M8.5 22.3v19.95h31V22.3"/>
+		<path d="M10.35 20.7 17.7 14.4l2.6 3.04-7.35 6.3z"/>
+		<path d="M4 42.25h40"/>`,
+	volets: `
+		<rect x="7.75" y="5.75" width="32.5" height="7.5"/>
+		<path d="M9.25 13.25v29M38.75 13.25v29"/>
+		<path d="M9.25 17.25h29.5M9.25 20.75h29.5M9.25 24.25h29.5M9.25 27.75h29.5M9.25 31.25h29.5"/>
+		<path d="M9.25 34.5h29.5" stroke-width="2.5"/>
+		<path d="M4 42.25h40"/>`,
+	portails: `
+		<rect x="4.75" y="11.75" width="4.5" height="30.5"/>
+		<rect x="38.75" y="11.75" width="4.5" height="30.5"/>
+		<path d="M10.75 39.5V17.25l12.5-4v26.25zM24.75 39.5V13.25l12.5 4V39.5z"/>
+		<path d="M14 16.2v23.3M17.2 15.2v24.3M20.4 14.2v25.3M27.6 14.2v25.3M30.8 15.2v24.3M34 16.2v23.3" opacity=".7"/>
+		<path d="M2 42.25h44"/>`,
+	'portes-garage': `
+		<path d="M5.75 42.25V11.75h36.5v30.5"/>
+		<rect x="8.75" y="14.75" width="30.5" height="5"/>
+		<path d="M8.75 42.25v-22.5h30.5v22.5"/>
+		<path d="M8.75 24.25h30.5M8.75 28.75h30.5M8.75 33.25h30.5M8.75 37.75h30.5" opacity=".7"/>
+		<path d="M2 42.25h44"/>`,
+	'portes-interieures': `
+		<path d="M12.75 42.25V5.75h22.5v36.5"/>
+		<path d="M15.75 42.25V8.75h16.5v33.5"/>
+		<rect x="18.25" y="12.25" width="9.5" height="11"/>
+		<rect x="18.25" y="27.25" width="9.5" height="11"/>
+		<path d="M30.75 25h-2"/>
+		<path d="M6 42.25h36"/>`,
+	serrures: `
+		<rect x="16.75" y="5.75" width="14.5" height="36.5" rx="1"/>
+		<circle cx="24" cy="14.5" r="2.25"/>
+		<path d="M26.25 14.5h11.5"/>
+		<circle cx="24" cy="27" r="2.75"/>
+		<path d="M24 29.75v5"/>`,
+	'stores-bannes': `
+		<path d="M8.25 4v38.25"/>
+		<rect x="8.25" y="10.75" width="5" height="4.5"/>
+		<path d="M13.25 13 42 21.5v5"/>
+		<path d="M8.25 25 41 22" stroke-dasharray="2 2" opacity=".55"/>
+		<path d="M4 42.25h40"/>`,
+	agencement: `
+		<rect x="7.75" y="5.75" width="32.5" height="36.5"/>
+		<path d="M24 5.75v36.5"/>
+		<path d="M7.75 15.25H24M7.75 24.75H24M7.75 34.25H24"/>
+		<path d="M27.75 21v6"/>
+		<path d="M4 42.25h40"/>`,
+};
+---
+
+<svg
+	class="service-icon"
+	viewBox="0 0 48 48"
+	width="48"
+	height="48"
+	fill="none"
+	stroke="currentColor"
+	stroke-width="1.5"
+	aria-hidden="true"
+	set:html={drawings[name] ?? ''}
+/>
+
+<style>
+	.service-icon {
+		width: 100%;
+		height: auto;
+	}
+</style>

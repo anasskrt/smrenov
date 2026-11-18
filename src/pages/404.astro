@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import { services } from '../data/services';
+import { site } from '../data/site';
+---
+
+<Layout title="Page introuvable | smrenov24" description="Cette page n'existe pas ou a été déplacée." noindex hasQuoteForm={false}>
+	<PageHero
+		title="Page introuvable"
+		lead="Cette page n'existe pas ou a été déplacée. Retrouvez nos prestations ci-dessous, ou appelez-nous directement."
+		crumbs={[{ label: 'Accueil', href: '/' }, { label: 'Page introuvable' }]}
+	>
+		<Fragment slot="actions">
+			<a class="btn" href="/">Retour à l'accueil</a>
+			<a class="btn btn--ghost" href={site.phoneHref}>Appeler le {site.phone}</a>
+		</Fragment>
+	</PageHero>
+
+	<section class="lost">
+		<div class="container">
+			<h2 class="lost__title">Nos prestations</h2>
+			<ul role="list">
+				{services.map((service) => <li><a href={`/prestations/${service.slug}/`}>{service.title}</a></li>)}
+			</ul>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	.lost {
+		padding-block: clamp(3rem, 2rem + 4vw, 5rem);
+	}
+
+	.lost__title {
+		font-size: 1.25rem;
+	}
+
+	ul {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0 2.5rem;
+		margin-top: 1.25rem;
+		max-width: 48rem;
+	}
+
+	a {
+		display: block;
+		padding-block: 0.75rem;
+		border-bottom: 1px solid var(--rule);
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	a:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
+	}
+
+	@media (max-width: 560px) {
+		ul {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

@@ -1,0 +1,130 @@
+---
+import Brand from './Brand.astro';
+import { site, zone } from '../data/site';
+import { services } from '../data/services';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer on-dark">
+	<div class="container footer__grid">
+		<div class="footer__brand">
+			<Brand />
+			<p>
+				Menuisier à {site.city}, en {site.department}. Pose et remplacement de menuiseries extérieures et intérieures,
+				agencement sur mesure.
+			</p>
+		</div>
+
+		<nav aria-label="Prestations">
+			<p class="footer__h">Prestations</p>
+			<ul role="list">
+				{services.map((service) => <li><a href={`/prestations/${service.slug}/`}>{service.shortTitle}</a></li>)}
+			</ul>
+		</nav>
+
+		<div>
+			<p class="footer__h">Contact</p>
+			<address>
+				<a href={site.phoneHref}>{site.phone}</a>
+				<a href={site.emailHref}>{site.email}</a>
+				<span>{site.address}<br />{site.postalCode} {site.addressCity}</span>
+			</address>
+		</div>
+
+		<div>
+			<p class="footer__h">Zone d'intervention</p>
+			<p class="footer__zone">
+				{site.radiusKm}&nbsp;km autour de {site.city}&nbsp;:{' '}
+				{zone.filter((place) => place.group !== 'proche' || place.main).map((place) => place.name).join(', ')}.
+			</p>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="footer__bottom">
+			<p>© {year} {site.name}</p>
+			<div class="footer__legal">
+				<a href="/realisations/">Réalisations</a>
+				<a href="/mentions-legales/">Mentions légales</a>
+				<a href="/mentions-legales/#donnees-personnelles">Confidentialité</a>
+				<a href="/cgu/">CGU</a>
+			</div>
+		</div>
+	</div>
+</footer>
+
+<style>
+	.footer {
+		padding-top: clamp(3.5rem, 6vw, 5.5rem);
+		background: var(--black);
+		font-size: 0.9375rem;
+	}
+
+	.footer__grid {
+		display: grid;
+		grid-template-columns: 1.5fr 1fr 1.2fr 1.3fr;
+		gap: 2.5rem 3rem;
+		padding-bottom: clamp(3rem, 5vw, 4.5rem);
+	}
+
+	.footer__brand p {
+		margin-top: 1.25rem;
+		max-width: 34ch;
+		color: var(--fg-soft);
+	}
+
+	.footer__h {
+		margin-bottom: 1rem;
+		font-size: 0.875rem;
+		color: var(--fg-soft);
+	}
+
+	ul,
+	address {
+		display: grid;
+		gap: 0.5rem;
+		font-style: normal;
+	}
+
+	a {
+		text-decoration: none;
+	}
+
+	a:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
+	}
+
+	.footer__zone {
+		line-height: 1.7;
+	}
+
+	.footer__legal {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.5rem;
+	}
+
+	.footer__bottom {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-block: 1.5rem;
+		border-top: 1px solid var(--rule);
+		font-size: 0.875rem;
+		color: var(--fg-soft);
+	}
+
+	@media (max-width: 900px) {
+		.footer__grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 560px) {
+		.footer__grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

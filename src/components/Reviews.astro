@@ -1,0 +1,185 @@
+---
+import Icon from './Icon.astro';
+import { reviews, rating, site, isTodo } from '../data/site';
+---
+
+<section id="avis" class="reviews" aria-labelledby="reviews-title">
+	<div class="container">
+		<div class="reviews__head">
+			<h2 id="reviews-title" class="title">Ce que disent nos clients</h2>
+			<div class="rating">
+				<p class="rating__score">
+					<span class:list={{ todo: isTodo(rating.score) }}>{rating.score}</span><span class="rating__max">/5</span>
+				</p>
+				<p class="rating__meta">
+					Note Google, <span class:list={{ todo: isTodo(rating.count) }}>{rating.count}</span> avis
+				</p>
+				<a class="link" href={site.googleReviewsUrl} target="_blank" rel="noopener">Laisser un avis sur Google</a>
+			</div>
+		</div>
+
+		<ul class="reviews__list" role="list">
+			{
+				reviews.map((review) => (
+					<li>
+						<figure class="review">
+							<div class="review__top">
+								<span class="review__mark" aria-hidden="true">«</span>
+								<span class="stars" role="img" aria-label={review.rating ? `${review.rating} sur 5` : 'Note à compléter'}>
+									{[1, 2, 3, 4, 5].map((n) => (
+										<Icon name="star" class={review.rating && n <= review.rating ? 'is-on' : ''} />
+									))}
+								</span>
+							</div>
+							<blockquote>
+								<p class:list={{ todo: isTodo(review.text) }}>{review.text}</p>
+							</blockquote>
+							<figcaption>
+								<strong class:list={{ todo: isTodo(review.author) }}>{review.author}</strong>
+								<span>
+									{review.service}, <span class:list={{ todo: isTodo(review.place) }}>{review.place}</span>
+								</span>
+							</figcaption>
+						</figure>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<style>
+	.reviews {
+		padding-block: var(--section);
+	}
+
+	.reviews__head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: end;
+		justify-content: space-between;
+		gap: 2rem;
+		margin-bottom: clamp(2.5rem, 5vw, 4rem);
+	}
+
+	.reviews__head .title {
+		max-width: 14ch;
+	}
+
+	.rating {
+		display: grid;
+		justify-items: start;
+		gap: 0.375rem;
+	}
+
+	.rating__score {
+		font-size: 3rem;
+		font-stretch: 125%;
+		font-weight: 650;
+		line-height: 1;
+		letter-spacing: -0.03em;
+	}
+
+	.rating__max {
+		margin-left: 0.25rem;
+		font-size: 1.25rem;
+		color: var(--fg-soft);
+	}
+
+	.rating__meta {
+		font-size: 0.9375rem;
+		color: var(--fg-soft);
+	}
+
+	.rating .link {
+		font-size: 0.9375rem;
+	}
+
+	.reviews__list {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		border-top: 1px solid var(--fg);
+	}
+
+	.reviews__list li {
+		padding: 2rem 2rem 0 0;
+	}
+
+	.reviews__list li + li {
+		padding-left: 2rem;
+		border-left: 1px solid var(--rule);
+	}
+
+	.review {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+		height: 100%;
+	}
+
+	.review__top {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.review__mark {
+		font-size: 3.5rem;
+		font-stretch: 125%;
+		font-weight: 600;
+		line-height: 0.6;
+		color: var(--night);
+	}
+
+	.stars {
+		display: inline-flex;
+		gap: 0.125rem;
+		color: var(--line);
+	}
+
+	.stars :global(svg) {
+		width: 1rem;
+		height: 1rem;
+	}
+
+	.stars :global(.is-on) {
+		color: var(--night);
+		fill: currentColor;
+	}
+
+	blockquote {
+		flex: 1;
+		font-size: 1.125rem;
+		line-height: 1.55;
+	}
+
+	figcaption {
+		display: grid;
+		gap: 0.125rem;
+		padding-top: 1.25rem;
+		border-top: 1px solid var(--rule);
+		font-size: 0.9375rem;
+	}
+
+	figcaption > span {
+		color: var(--fg-soft);
+	}
+
+	@media (max-width: 900px) {
+		.reviews__list {
+			grid-template-columns: 1fr;
+		}
+
+		.reviews__list li,
+		.reviews__list li + li {
+			padding: 2rem 0;
+			border-left: 0;
+			border-bottom: 1px solid var(--rule);
+		}
+
+		figcaption {
+			border-top: 0;
+			padding-top: 0;
+		}
+	}
+</style>

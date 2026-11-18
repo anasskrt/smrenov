@@ -1,0 +1,20 @@
+# Configuration Apache (hébergement IONOS)
+
+# Page d'erreur personnalisée
+ErrorDocument 404 /404.html
+
+# Anciennes adresses de smrenov24.fr redirigées vers les nouvelles (conserve le référencement acquis)
+Redirect 301 /mentions-legales.html https://smrenov24.fr/mentions-legales/
+
+# Mise en cache longue des polices et des fichiers versionnés par Astro
+<IfModule mod_expires.c>
+	ExpiresActive On
+	ExpiresByType font/woff2 "access plus 1 year"
+	ExpiresByType image/png "access plus 1 month"
+	ExpiresByType image/svg+xml "access plus 1 month"
+</IfModule>
+<IfModule mod_headers.c>
+	<FilesMatch "^_astro/">
+		Header set Cache-Control "public, max-age=31536000, immutable"
+	</FilesMatch>
+</IfModule>

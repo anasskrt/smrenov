@@ -1,0 +1,122 @@
+---
+import ServiceIcon from './ServiceIcon.astro';
+import { services } from '../data/services';
+---
+
+<section id="prestations" class="services" aria-labelledby="services-title">
+	<div class="container">
+		<div class="services__head">
+			<h2 id="services-title" class="title">Nos prestations de menuiserie</h2>
+			<p class="lead">
+				Pose et remplacement de menuiseries extérieures et intérieures, en neuf comme en rénovation. Chaque chantier
+				commence par une visite pour prendre les cotes exactes.
+			</p>
+		</div>
+
+		<ul class="services__grid" role="list">
+			{
+				services.map((service) => (
+					<li class="service">
+						<div class="service__icon">
+							<ServiceIcon name={service.slug} />
+						</div>
+						<div>
+							<h3>
+								<a href={`/prestations/${service.slug}/`}>{service.title}</a>
+							</h3>
+							<p>{service.short}</p>
+							<div class="service__links">
+								<a class="link" href={`/prestations/${service.slug}/`}>
+									En savoir plus<span class="sr-only"> : {service.title}</span>
+								</a>
+								<a class="link service__quote" href="#devis">
+									Demander un devis<span class="sr-only"> : {service.title}</span>
+								</a>
+							</div>
+						</div>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<style>
+	.services {
+		padding-block: var(--section);
+	}
+
+	.services__head {
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		gap: 1.5rem clamp(2.5rem, 6vw, 7rem);
+		align-items: end;
+		margin-bottom: clamp(2.5rem, 5vw, 4rem);
+	}
+
+	.services__grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		column-gap: clamp(2rem, 5vw, 5rem);
+		border-top: 1px solid var(--fg);
+	}
+
+	.service {
+		display: grid;
+		grid-template-columns: 3.5rem minmax(0, 1fr);
+		gap: 1.5rem;
+		padding-block: 2rem;
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.service__icon {
+		color: var(--night);
+	}
+
+	.service h3 {
+		font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+	}
+
+	.service h3 a {
+		text-decoration: none;
+	}
+
+	.service h3 a:hover {
+		text-decoration: underline;
+		text-decoration-thickness: 2px;
+		text-underline-offset: 0.2em;
+	}
+
+	.service p {
+		margin-top: 0.5rem;
+		max-width: 48ch;
+		color: var(--fg-soft);
+	}
+
+	.service__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.5rem;
+		margin-top: 1rem;
+		font-size: 0.9375rem;
+	}
+
+	.service__quote {
+		color: var(--fg-soft);
+	}
+
+	@media (max-width: 900px) {
+		.services__head,
+		.services__grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (max-width: 560px) {
+		.service {
+			grid-template-columns: 2.75rem minmax(0, 1fr);
+			gap: 1.125rem;
+			padding-block: 1.75rem;
+		}
+	}
+</style>

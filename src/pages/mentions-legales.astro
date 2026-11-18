@@ -1,0 +1,134 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import { site } from '../data/site';
+
+const { legal } = site;
+const updated = '12 novembre 2026';
+---
+
+<Layout
+	hasQuoteForm={false}
+	title="Mentions légales et confidentialité | smrenov24"
+	description="Mentions légales du site smrenov24.fr : éditeur, hébergeur, propriété intellectuelle, données personnelles et cookies."
+>
+	<PageHero
+		title="Mentions légales"
+		lead="Informations légales du site smrenov24.fr, conformément à la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN)."
+		crumbs={[{ label: 'Accueil', href: '/' }, { label: 'Mentions légales' }]}
+	/>
+
+	<section class="legal">
+		<div class="container">
+			<div class="prose">
+				<h2>Éditeur du site</h2>
+				<p>
+					Le site smrenov24.fr est édité par <strong>{legal.owner}</strong>, {legal.status.toLowerCase()}, exerçant sous le
+					nom commercial <strong>{site.legalName}</strong>.
+				</p>
+				<dl>
+					<dt>SIRET</dt>
+					<dd>{legal.siret}</dd>
+					<dt>Immatriculation</dt>
+					<dd>Registre national des entreprises (RNE), SIREN {legal.siren}</dd>
+					<dt>Adresse</dt>
+					<dd>{site.address}, {site.postalCode} {site.addressCity}</dd>
+					<dt>Téléphone</dt>
+					<dd><a href={site.phoneHref}>{site.phone}</a></dd>
+					<dt>Email</dt>
+					<dd><a href={site.emailHref}>{site.email}</a></dd>
+					<dt>TVA</dt>
+					<dd>{legal.vat}</dd>
+				</dl>
+
+				<h2>Directeur de la publication</h2>
+				<p>{legal.owner}</p>
+
+				<h2>Hébergeur</h2>
+				<p>
+					<strong>{legal.host.name}</strong><br />
+					{legal.host.address}, France<br />
+					Téléphone : {legal.host.phone}
+				</p>
+
+				<h2>Propriété intellectuelle</h2>
+				<p>
+					L'ensemble des contenus du site (textes, photographies, logo, illustrations et mise en page) est la propriété
+					de {site.legalName}, sauf mention contraire. Toute reproduction, représentation ou diffusion, totale ou
+					partielle, sans autorisation écrite préalable est interdite.
+				</p>
+
+				<h2>Responsabilité</h2>
+				<p>
+					Les informations présentées sur le site sont fournies à titre indicatif et ne constituent pas une offre
+					contractuelle. Seul un devis signé et accepté engage {site.legalName}.
+				</p>
+
+				<h2 id="donnees-personnelles">Données personnelles</h2>
+				<h3>Responsable du traitement</h3>
+				<p>{legal.owner} ({site.legalName}), joignable à l'adresse <a href={site.emailHref}>{site.email}</a>.</p>
+
+				<h3>Données collectées et finalité</h3>
+				<p>
+					Le formulaire de demande de devis collecte : nom et prénom, téléphone, adresse email (facultative), commune,
+					type de projet et message. Ces données servent uniquement à répondre à votre demande de devis et à vous
+					recontacter à ce sujet. Elles ne sont ni vendues ni utilisées à des fins publicitaires.
+				</p>
+
+				<h3>Base légale</h3>
+				<p>
+					Le traitement repose sur l'exécution de mesures précontractuelles prises à votre demande (article 6.1.b du
+					RGPD).
+				</p>
+
+				<h3>Destinataires</h3>
+				<p>
+					Les données sont destinées à {site.legalName} uniquement. Elles transitent par l'hébergeur du site et par le
+					service d'envoi des emails <span class="todo">[À COMPLÉTER : nom du service une fois le formulaire branché]</span>,
+					puis sont reçues dans une messagerie Gmail fournie par Google Ireland Ltd. Ces prestataires peuvent traiter des
+					données hors de l'Union européenne, notamment aux États-Unis, dans le cadre de garanties appropriées (clauses
+					contractuelles types de la Commission européenne, Data Privacy Framework).
+				</p>
+
+				<h3>Durée de conservation</h3>
+				<p>
+					Trois ans à compter du dernier contact si aucun devis n'est signé. En cas de travaux, le devis et la facture
+					sont conservés dix ans, conformément aux obligations comptables.
+				</p>
+
+				<h3>Vos droits</h3>
+				<p>
+					Vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, de portabilité et
+					d'opposition. Pour les exercer, écrivez à <a href={site.emailHref}>{site.email}</a>. Vous pouvez également
+					introduire une réclamation auprès de la CNIL (<a href="https://www.cnil.fr" target="_blank" rel="noopener"
+						>cnil.fr</a
+					>).
+				</p>
+
+				<h2 id="cookies">Cookies</h2>
+				<p>
+					Le site ne dépose aucun cookie et n'utilise aucun outil de mesure d'audience ni de publicité. Les polices de
+					caractères sont hébergées sur le site lui-même : aucune donnée de navigation n'est transmise à un service tiers
+					lors de la consultation des pages. Les liens vers Google (avis) ou WhatsApp ouvrent les services concernés,
+					soumis à leurs propres conditions.
+				</p>
+
+				<h2>Droit applicable</h2>
+				<p>Le site et les présentes mentions sont régis par le droit français.</p>
+
+				<p class="legal__updated">Dernière mise à jour : {updated}</p>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	.legal {
+		padding-block: clamp(3rem, 2rem + 4vw, 5.5rem) var(--section);
+	}
+
+	.legal__updated {
+		margin-top: 3rem;
+		font-size: 0.875rem;
+	}
+</style>

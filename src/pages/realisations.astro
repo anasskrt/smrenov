@@ -1,0 +1,190 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import Contact from '../components/Contact.astro';
+import { projects } from '../data/projects';
+import { services } from '../data/services';
+
+// Filtres : uniquement les prestations qui ont au moins une réalisation, dans l'ordre des prestations.
+const filters = services
+	.map((service) => ({ ...service, count: projects.filter((p) => p.service === service.slug).length }))
+	.filter((service) => service.count > 0);
+
+const label = (n: number) => `${n} réalisation${n > 1 ? 's' : ''}`;
+---
+
+<Layout
+	title="Nos réalisations à Périgueux et alentours | smrenov24"
+	description="Fenêtres, portes d'entrée, portes intérieures, portails et portes de garage posés par smrenov24 chez des particuliers à Périgueux et dans les communes alentour."
+>
+	<PageHero
+		title="Nos réalisations"
+		lead="Des chantiers réalisés chez des particuliers à Périgueux et dans les communes alentour : fenêtres, portes d'entrée, portes intérieures, portails et portes de garage."
+		crumbs={[{ label: 'Accueil', href: '/' }, { label: 'Réalisations' }]}
+	/>
+
+	<section class="gallery" aria-label="Galerie des réalisations">
+		<div class="container">
+			<div class="filters" role="group" aria-label="Filtrer par prestation" data-filters>
+				<button type="button" aria-pressed="true" data-filter="all">Toutes <span>{projects.length}</span></button>
+				{
+					filters.map((service) => (
+						<button type="button" aria-pressed="false" data-filter={service.slug}>
+							{service.shortTitle} <span>{service.count}</span>
+						</button>
+					))
+				}
+			</div>
+
+			<p class="gallery__count" role="status" data-count>{label(projects.length)}</p>
+
+			<ul class="gallery__grid" role="list">
+				{
+					projects.map((project) => (
+						<li data-service={project.service}>
+							<ProjectCard project={project} />
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+
+	<CtaBanner />
+	<Contact />
+</Layout>
+
+<style>
+	.gallery {
+		padding-block: clamp(3rem, 2rem + 4vw, 5.5rem) var(--section);
+	}
+
+	.filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.filters button {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 2.75rem;
+		padding: 0.5rem 1rem;
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+		background: var(--white);
+		font-size: 0.9375rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition:
+			border-color 0.15s,
+			background-color 0.15s,
+			color 0.15s;
+	}
+
+	.filters button:hover {
+		border-color: var(--fg);
+	}
+
+	.filters button span {
+		font-size: 0.8125rem;
+		font-stretch: var(--narrow);
+		color: var(--fg-soft);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.filters button[aria-pressed='true'] {
+		border-color: var(--night);
+		background: var(--night);
+		color: var(--white);
+	}
+
+	.filters button[aria-pressed='true'] span {
+		color: rgba(255, 255, 255, 0.7);
+	}
+
+	.gallery__count {
+		margin-block: 2rem 1.5rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid var(--fg);
+		font-size: 0.9375rem;
+		color: var(--fg-soft);
+	}
+
+	/* Photos prises en portrait : cartes verticales pour moins les recadrer */
+	.gallery__grid {
+		--ph-ratio: 4 / 5;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 2rem 1.5rem;
+	}
+
+	.gallery__grid li[hidden] {
+		display: none;
+	}
+
+	@media (max-width: 900px) {
+		.gallery__grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 560px) {
+		.gallery__grid {
+			grid-template-columns: 1fr;
+		}
+
+		/* Sur mobile, les filtres défilent horizontalement sur une ligne */
+		.filters {
+			flex-wrap: nowrap;
+			margin-inline: calc(-1 * var(--gutter));
+			padding-inline: var(--gutter);
+			overflow-x: auto;
+			scrollbar-width: none;
+		}
+
+		.filters::-webkit-scrollbar {
+			display: none;
+		}
+
+		.filters button {
+			flex: none;
+		}
+	}
+</style>
+
+<script>
+	const group = document.querySelector<HTMLElement>('[data-filters]');
+	const count = document.querySelector<HTMLElement>('[data-count]');
+	const items = document.querySelectorAll<HTMLElement>('[data-service]');
+
+	const apply = (filter: string) => {
+		let visible = 0;
+		items.forEach((item) => {
+			const show = filter === 'all' || item.dataset.service === filter;
+			item.hidden = !show;
+			if (show) visible++;
+		});
+		group?.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((button) => {
+			button.setAttribute('aria-pressed', String(button.dataset.filter === filter));
+		});
+		if (count) count.textContent = `${visible} réalisation${visible > 1 ? 's' : ''}`;
+	};
+
+	group?.addEventListener('click', (event) => {
+		const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-filter]');
+		if (!button?.dataset.filter) return;
+		apply(button.dataset.filter);
+		// Garde le filtre dans l'URL (partage d'un lien filtré, retour arrière)
+		const url = new URL(location.href);
+		if (button.dataset.filter === 'all') url.searchParams.delete('prestation');
+		else url.searchParams.set('prestation', button.dataset.filter);
+		history.replaceState(null, '', url);
+	});
+
+	const initial = new URLSearchParams(location.search).get('prestation');
+	if (initial && group?.querySelector(`[data-filter="${CSS.escape(initial)}"]`)) apply(initial);
+</script>

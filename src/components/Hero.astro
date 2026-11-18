@@ -1,0 +1,159 @@
+---
+import CotedPhoto from './CotedPhoto.astro';
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+import fenetre from '../assets/realisations/fenetre-anthracite-facade-pierre.jpg';
+---
+
+<section class="hero on-dark" aria-labelledby="hero-title" data-hero>
+	<div class="container hero__grid">
+		<div class="hero__text">
+			<h1 id="hero-title">Menuisier à {site.city}</h1>
+			<p class="hero__sub">Fenêtres, volets, portails et portes d'entrée, mesurés chez vous et posés au millimètre.</p>
+			<p class="hero__lead">
+				{site.name} intervient chez les particuliers à {site.city} et jusqu'à {site.radiusKm}&nbsp;km
+				autour. Le devis est gratuit et sans engagement.
+			</p>
+			<div class="hero__actions">
+				<a class="btn" href="#devis">Demander un devis gratuit</a>
+				<a class="btn btn--ghost" href={site.phoneHref}><Icon name="phone" />Appeler</a>
+			</div>
+		</div>
+
+		<CotedPhoto
+			label="Fenêtre anthracite posée sur une façade en pierre"
+			alt="Fenêtre anthracite posée par smrenov24 sur une façade en pierre, avec volets battants"
+			image={fenetre}
+			focus="center 35%"
+			width={1450}
+			height={2150}
+		/>
+	</div>
+
+	<div class="container">
+		<ul class="hero__facts" role="list">
+			<li><strong>Devis gratuit</strong><span>Sans engagement, après visite</span></li>
+			<li><strong>Prise de cotes</strong><span>Chez vous, avant toute commande</span></li>
+			<li>
+				<strong>{site.city} et alentours</strong>
+				<span>Jusqu'à {site.radiusKm}&nbsp;km, toute la Dordogne</span>
+			</li>
+			<li><strong>{site.experience} d'expérience</strong><span>Artisan menuisier en {site.department}</span></li>
+		</ul>
+	</div>
+</section>
+
+<style>
+	.hero {
+		background: var(--night);
+		padding-top: clamp(3rem, 1.5rem + 5vw, 6.5rem);
+		overflow: hidden;
+	}
+
+	.hero__grid {
+		display: grid;
+		grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+		gap: clamp(2.5rem, 6vw, 6rem);
+		align-items: center;
+	}
+
+	/* Le titre se dimensionne sur la largeur de sa colonne (container query), pas sur la fenêtre */
+	.hero__text {
+		container-type: inline-size;
+	}
+
+	h1 {
+		font-size: clamp(2.25rem, 15cqi, 6rem);
+		font-stretch: 125%;
+		font-weight: 700;
+		line-height: 0.98;
+		letter-spacing: -0.035em;
+	}
+
+	.hero__sub {
+		margin-top: 1.75rem;
+		max-width: 28ch;
+		font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.625rem);
+		font-weight: 500;
+		line-height: 1.35;
+	}
+
+	.hero__lead {
+		margin-top: 1.25rem;
+		max-width: 46ch;
+		color: var(--fg-soft);
+	}
+
+	.hero__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-top: 2.25rem;
+	}
+
+	/* Bandeau de réassurance ---------------------------------------------- */
+	.hero__facts {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		margin-top: clamp(3rem, 5vw, 4.5rem);
+		border-top: 1px solid var(--rule);
+	}
+
+	.hero__facts li {
+		display: grid;
+		align-content: start;
+		gap: 0.25rem;
+		padding: 1.5rem 1.5rem 2.25rem 0;
+	}
+
+	/* Sélecteurs de même spécificité (:not / :nth-child) pour que les media queries puissent les surcharger */
+	.hero__facts li:not(:first-child) {
+		padding-left: 1.5rem;
+		border-left: 1px solid var(--rule);
+	}
+
+	.hero__facts strong {
+		font-weight: 600;
+	}
+
+	.hero__facts li > span {
+		font-size: 0.9375rem;
+		color: var(--fg-soft);
+	}
+
+	@media (max-width: 700px) {
+		.hero__grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (max-width: 900px) {
+		.hero__facts {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.hero__facts li:nth-child(odd) {
+			padding-left: 0;
+			border-left: 0;
+		}
+
+		.hero__facts li:nth-child(n + 3) {
+			border-top: 1px solid var(--rule);
+		}
+	}
+
+	@media (max-width: 560px) {
+		.hero__actions .btn {
+			flex: 1 1 100%;
+		}
+
+		.hero__facts li {
+			padding-block: 1.25rem 1.5rem;
+			padding-right: 1rem;
+		}
+
+		.hero__facts li:nth-child(even) {
+			padding-left: 1rem;
+		}
+	}
+</style>

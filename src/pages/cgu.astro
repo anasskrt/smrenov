@@ -1,0 +1,101 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import { site } from '../data/site';
+
+const updated = '12 novembre 2026';
+---
+
+<Layout
+	hasQuoteForm={false}
+	title="Conditions générales d'utilisation | smrenov24"
+	description="Conditions générales d'utilisation du site smrenov24.fr : accès au site, contenus, formulaire de devis, responsabilité et droit applicable."
+>
+	<PageHero
+		title="Conditions générales d'utilisation"
+		lead="Les présentes conditions encadrent l'utilisation du site smrenov24.fr. En naviguant sur le site, vous les acceptez."
+		crumbs={[{ label: 'Accueil', href: '/' }, { label: 'CGU' }]}
+	/>
+
+	<section class="legal">
+		<div class="container">
+			<div class="prose">
+				<h2>1. Objet</h2>
+				<p>
+					Le site smrenov24.fr présente l'activité de {site.legalName}, entreprise de menuiserie installée à
+					{site.addressCity} ({site.department}) : pose et remplacement de menuiseries extérieures et intérieures,
+					agencement intérieur. Il permet de consulter ces prestations et de demander un devis. L'éditeur du site est
+					identifié dans les <a href="/mentions-legales/">mentions légales</a>.
+				</p>
+
+				<h2>2. Accès au site</h2>
+				<p>
+					Le site est accessible gratuitement à tout utilisateur disposant d'un accès à Internet. Les frais d'accès
+					(matériel, connexion) restent à sa charge. {site.legalName} s'efforce de maintenir le site accessible, mais
+					peut en interrompre l'accès, notamment pour maintenance, sans que sa responsabilité puisse être engagée.
+				</p>
+
+				<h2>3. Contenus du site</h2>
+				<p>
+					Les descriptions de prestations, de matériaux et d'options sont fournies à titre informatif. Elles ne
+					constituent pas une offre contractuelle : la faisabilité, les caractéristiques et le prix de chaque projet
+					sont établis après visite, dans un devis personnalisé. Seul un devis signé engage les parties. Les photos de
+					réalisations illustrent des chantiers passés et ne sont pas contractuelles.
+				</p>
+
+				<h2>4. Demande de devis</h2>
+				<p>
+					Le formulaire de devis permet de transmettre une demande à {site.legalName}. L'utilisateur s'engage à fournir
+					des informations exactes et à ne pas utiliser le formulaire à des fins abusives ou malveillantes. L'envoi
+					d'une demande est gratuit et n'engage pas l'utilisateur. Le traitement des données transmises est décrit dans
+					la rubrique <a href="/mentions-legales/#donnees-personnelles">données personnelles</a>.
+				</p>
+
+				<h2>5. Propriété intellectuelle</h2>
+				<p>
+					Les textes, photographies, logo, illustrations et la mise en page du site sont protégés par le droit de la
+					propriété intellectuelle. Toute reproduction ou réutilisation sans autorisation écrite préalable de
+					{site.legalName} est interdite.
+				</p>
+
+				<h2>6. Liens externes</h2>
+				<p>
+					Le site peut contenir des liens vers des services tiers (Google, WhatsApp, CNIL…). {site.legalName} n'exerce
+					aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu ou à leur fonctionnement.
+				</p>
+
+				<h2>7. Responsabilité</h2>
+				<p>
+					{site.legalName} veille à l'exactitude des informations publiées, sans pouvoir garantir l'absence d'erreur ou
+					d'omission. Sa responsabilité ne saurait être engagée pour un dommage résultant de l'utilisation du site ou de
+					l'impossibilité d'y accéder.
+				</p>
+
+				<h2>8. Modification des conditions</h2>
+				<p>
+					{site.legalName} peut modifier les présentes conditions à tout moment. La version applicable est celle publiée
+					sur le site au moment de la consultation.
+				</p>
+
+				<h2>9. Droit applicable</h2>
+				<p>
+					Les présentes conditions sont soumises au droit français. Pour toute question, contactez
+					<a href={site.emailHref}>{site.email}</a>.
+				</p>
+
+				<p class="legal__updated">Dernière mise à jour : {updated}</p>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	.legal {
+		padding-block: clamp(3rem, 2rem + 4vw, 5.5rem) var(--section);
+	}
+
+	.legal__updated {
+		margin-top: 3rem;
+		font-size: 0.875rem;
+	}
+</style>

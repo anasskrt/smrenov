@@ -1,0 +1,114 @@
+---
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import MobileBar from '../components/MobileBar.astro';
+import { site, zone } from '../data/site';
+import { services } from '../data/services';
+
+interface Props {
+	title?: string;
+	description?: string;
+	/** Données structurées propres à la page (Service, BreadcrumbList…) */
+	schema?: Record<string, unknown>[];
+	/** Exclut la page de l'indexation (ex. page 404) */
+	noindex?: boolean;
+	/** La page contient-elle le formulaire de devis ? Sinon les boutons « Devis » renvoient vers l'accueil */
+	hasQuoteForm?: boolean;
+}
+
+const {
+	title = 'Menuisier à Périgueux | smrenov24, fenêtres, portes, volets, portails',
+	description = "smrenov24, menuisier aux portes de Périgueux : pose et remplacement de fenêtres, portes, volets, portails, stores et agencement intérieur en Dordogne. Devis gratuit.",
+	schema = [],
+	noindex = false,
+	hasQuoteForm = true,
+} = Astro.props;
+
+const devisHref = hasQuoteForm ? '#devis' : '/#devis';
+
+const siteUrl = Astro.site ?? new URL(site.url);
+const canonical = new URL(Astro.url.pathname, siteUrl).href;
+const ogImage = new URL('/og-image.png', siteUrl).href;
+
+// Fiche entreprise (SEO local) : identique sur toutes les pages, cohérente avec la fiche Google.
+const business = {
+	'@context': 'https://schema.org',
+	'@type': 'HomeAndConstructionBusiness',
+	'@id': `${site.url}/#entreprise`,
+	name: site.legalName,
+	url: `${site.url}/`,
+	image: ogImage,
+	logo: new URL('/favicon.svg', siteUrl).href,
+	telephone: site.phoneIntl,
+	email: site.email,
+	address: {
+		'@type': 'PostalAddress',
+		streetAddress: site.address,
+		postalCode: site.postalCode,
+		addressLocality: site.addressCity,
+		addressRegion: 'Nouvelle-Aquitaine',
+		addressCountry: 'FR',
+	},
+	areaServed: [
+		{ '@type': 'AdministrativeArea', name: site.department },
+		...zone.filter((place) => place.group !== 'limitrophe').map((place) => ({ '@type': 'City', name: place.name })),
+	],
+	hasOfferCatalog: {
+		'@type': 'OfferCatalog',
+		name: 'Prestations de menuiserie',
+		itemListElement: services.map((service) => ({
+			'@type': 'Offer',
+			itemOffered: { '@type': 'Service', name: service.title, url: `${site.url}/prestations/${service.slug}/` },
+		})),
+	},
+	founder: { '@type': 'Person', name: site.legal.ownerDisplay },
+};
+
+const jsonLd = [business, ...schema];
+---
+
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#0f2147" />
+		<meta name="generator" content={Astro.generator} />
+
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		{noindex && <meta name="robots" content="noindex" />}
+
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" sizes="32x32" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+
+		<!-- Police hébergée sur le site (aucun appel à un service tiers) -->
+		<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+		<!-- Partage sur les réseaux sociaux et messageries -->
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="fr_FR" />
+		<meta property="og:site_name" content={site.legalName} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta name="twitter:card" content="summary_large_image" />
+
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd.length === 1 ? jsonLd[0] : jsonLd)} />
+	</head>
+	<body>
+		<Navbar devisHref={devisHref} />
+		<main id="contenu">
+			<slot />
+		</main>
+		<Footer />
+		<MobileBar devisHref={devisHref} />
+	</body>
+</html>

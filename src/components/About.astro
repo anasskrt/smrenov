@@ -1,0 +1,223 @@
+---
+import { Image } from 'astro:assets';
+import camion from '../assets/realisations/camion-smrenov24.jpg';
+import ZoneMap from './ZoneMap.astro';
+import { site, zone } from '../data/site';
+
+const listed = zone.filter((place) => place.group !== 'limitrophe');
+const beyond = zone.filter((place) => place.group === 'limitrophe').map((place) => place.name);
+---
+
+<section id="entreprise" class="about" aria-labelledby="about-title">
+	<div class="container about__grid">
+		<div class="about__photo">
+			<Image
+				class="about__img"
+				src={camion}
+				alt={`Le camion de ${site.name}, artisan menuisier à ${site.addressCity}`}
+				widths={[480, 800, 1200]}
+				sizes="(max-width: 900px) 90vw, 40vw"
+			/>
+		</div>
+
+		<div>
+			<h2 id="about-title" class="title">Un menuisier installé aux portes de {site.city}</h2>
+			<p class="lead about__lead">
+				{site.name} est installée à {site.addressCity}, à quelques kilomètres de {site.city}. Nous intervenons chez
+				les particuliers pour remplacer ou installer fenêtres, volets, portails et portes d'entrée, et pour
+				l'agencement intérieur, de la prise de cotes jusqu'à la pose.
+			</p>
+			<p class="about__todo">
+				Derrière {site.name}, il y a {site.legal.ownerDisplay}, artisan
+				menuisier fort de {site.experience} d'expérience.
+			</p>
+
+			<dl class="about__facts">
+				<div>
+					<dt>Adresse</dt>
+					<dd>{site.address}<br />{site.postalCode} {site.addressCity}</dd>
+				</div>
+				<div>
+					<dt>Téléphone</dt>
+					<dd><a href={site.phoneHref}>{site.phone}</a></dd>
+				</div>
+				<div>
+					<dt>Rayon d'intervention</dt>
+					<dd>{site.radiusKm}&nbsp;km autour de {site.city}</dd>
+				</div>
+			</dl>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="zone on-dark">
+			<div class="zone__text">
+				<h3>Zone d'intervention</h3>
+				<p>
+					Nous intervenons dans un rayon de {site.radiusKm}&nbsp;km autour de {site.city}, dans toute la {site.department},
+					notamment&nbsp;:
+				</p>
+				<ul class="zone__list" role="list">
+					{listed.map((place) => <li>{place.name}</li>)}
+				</ul>
+				<p class="zone__beyond">Et jusqu'à {beyond.slice(0, -1).join(', ')} et {beyond.at(-1)}.</p>
+				<p class="zone__note">
+					Votre commune n'apparaît pas&nbsp;? <a class="link" href={site.phoneHref}>Appelez-nous</a>, nous vous dirons
+					si nous pouvons intervenir.
+				</p>
+			</div>
+			<div class="zone__map">
+				<ZoneMap />
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.about {
+		padding-block: var(--section);
+	}
+
+	.about__grid {
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		gap: clamp(2.5rem, 6vw, 7rem);
+		align-items: center;
+	}
+
+	.about__lead {
+		margin-top: 1.5rem;
+	}
+
+	.about__todo {
+		margin-top: 1rem;
+		max-width: 56ch;
+	}
+
+	.about__facts {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		margin-top: 2.5rem;
+		border-top: 1px solid var(--fg);
+	}
+
+	.about__facts > div {
+		padding: 1.25rem 1.25rem 0 0;
+	}
+
+	.about__facts > div + div {
+		padding-left: 1.25rem;
+		border-left: 1px solid var(--rule);
+	}
+
+	dt {
+		font-size: 0.875rem;
+		color: var(--fg-soft);
+	}
+
+	dd {
+		margin-top: 0.375rem;
+		font-weight: 600;
+		line-height: 1.4;
+	}
+
+	dd a {
+		text-decoration: none;
+	}
+
+	/* Panneau zone d'intervention ----------------------------------------- */
+	.zone {
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		gap: clamp(2rem, 5vw, 5rem);
+		align-items: center;
+		margin-top: clamp(4rem, 8vw, 7.5rem);
+		padding: clamp(2rem, 1rem + 4vw, 4.5rem);
+		background: var(--night);
+	}
+
+	.zone h3 {
+		font-size: clamp(1.625rem, 1.2rem + 1.6vw, 2.5rem);
+	}
+
+	.zone__text > p:first-of-type {
+		margin-top: 1rem;
+		color: var(--fg-soft);
+	}
+
+	.zone__list {
+		columns: 2;
+		column-gap: 1.5rem;
+		margin-top: 1.5rem;
+		border-top: 1px solid var(--rule);
+	}
+
+	.zone__list li {
+		break-inside: avoid;
+		padding-block: 0.625rem;
+		border-bottom: 1px solid var(--rule);
+		font-size: 0.9375rem;
+		font-weight: 500;
+	}
+
+	.zone__beyond {
+		margin-top: 1.25rem;
+		font-size: 0.9375rem;
+	}
+
+	.zone__note {
+		margin-top: 1.5rem;
+		font-size: 0.9375rem;
+		color: var(--fg-soft);
+	}
+
+	.zone__note .link {
+		color: var(--fg);
+	}
+
+	@media (max-width: 900px) {
+		.about__grid,
+		.zone {
+			grid-template-columns: 1fr;
+		}
+
+		.about__photo {
+			--ph-ratio: 16 / 9;
+		}
+	}
+
+	.about__img {
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: var(--ph-ratio, 4 / 5);
+		object-fit: cover;
+		object-position: center 45%;
+	}
+
+	@media (max-width: 560px) {
+		.about__photo {
+			--ph-ratio: 4 / 3;
+		}
+
+		.about__facts {
+			grid-template-columns: 1fr;
+		}
+
+		.about__facts > div,
+		.about__facts > div + div {
+			padding: 1rem 0;
+			border-left: 0;
+			border-bottom: 1px solid var(--rule);
+		}
+
+		.zone {
+			margin-inline: calc(-1 * var(--gutter));
+			padding-inline: var(--gutter);
+		}
+
+		.zone__list {
+			columns: 1;
+		}
+	}
+</style>

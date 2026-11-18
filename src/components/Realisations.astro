@@ -1,0 +1,121 @@
+---
+import ProjectCard from './ProjectCard.astro';
+import { projects } from '../data/projects';
+
+const preview = projects.slice(0, 6);
+---
+
+<section id="realisations" class="works" aria-labelledby="works-title">
+	<div class="container">
+		<div class="works__head">
+			<div>
+				<h2 id="works-title" class="title">Nos dernières réalisations</h2>
+				<p class="lead">Quelques chantiers récents, réalisés chez des particuliers autour de Périgueux.</p>
+			</div>
+			<a class="btn btn--ghost" href="/realisations/">Voir toutes les réalisations</a>
+		</div>
+
+		<ul class="works__grid" role="list">
+			{
+				preview.map((project) => (
+					<li class="work">
+						<ProjectCard project={project} />
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<style>
+	.works {
+		padding-block: var(--section);
+		background: var(--mist);
+	}
+
+	.works__head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: end;
+		justify-content: space-between;
+		gap: 1.5rem 2rem;
+		margin-bottom: clamp(2.25rem, 4vw, 3.5rem);
+	}
+
+	.works__head .lead {
+		margin-top: 1rem;
+	}
+
+	.works__grid {
+		display: grid;
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		gap: clamp(1.25rem, 2vw, 1.75rem) clamp(1rem, 2vw, 1.5rem);
+	}
+
+	/* Grille asymétrique : une grande photo + deux à droite, puis une rangée de trois */
+	.work:nth-child(1) {
+		grid-column: 1 / span 7;
+		grid-row: 1 / span 2;
+		--pcard-flex: 1;
+		--pcard-min-h: 20rem;
+		--ph-pos: absolute;
+		--ph-ratio: auto;
+	}
+
+	.work:nth-child(2),
+	.work:nth-child(3) {
+		grid-column: 8 / span 5;
+	}
+
+	.work:nth-child(n + 4) {
+		grid-column: span 4;
+	}
+
+	@media (max-width: 1023px) {
+		.works__grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.work:nth-child(n) {
+			grid-column: auto;
+			grid-row: auto;
+			--pcard-flex: none;
+			--pcard-min-h: 0;
+			--ph-pos: relative;
+			--ph-ratio: 4 / 3;
+		}
+
+		.work:nth-child(1),
+		.work:nth-child(6) {
+			grid-column: 1 / -1;
+			--ph-ratio: 16 / 9;
+		}
+	}
+
+	/* Mobile : défilement horizontal */
+	@media (max-width: 719px) {
+		.works__grid {
+			grid-template-columns: none;
+			grid-auto-flow: column;
+			grid-auto-columns: 82%;
+			margin-inline: calc(-1 * var(--gutter));
+			padding-inline: var(--gutter);
+			padding-bottom: 0.5rem;
+			overflow-x: auto;
+			overscroll-behavior-x: contain;
+			scroll-snap-type: x mandatory;
+			scroll-padding-inline: var(--gutter);
+			scrollbar-width: none;
+		}
+
+		.works__grid::-webkit-scrollbar {
+			display: none;
+		}
+
+		.work:nth-child(n) {
+			grid-column: auto;
+			scroll-snap-align: start;
+			--ph-ratio: 4 / 3;
+		}
+	}
+</style>
